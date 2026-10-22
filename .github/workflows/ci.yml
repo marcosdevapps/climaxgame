@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
+          # pnpm todavía no existe en este punto: lo activa corepack en el paso siguiente.
+          package-manager-cache: false
 
       - name: Activar pnpm (versión de packageManager)
         run: corepack enable
