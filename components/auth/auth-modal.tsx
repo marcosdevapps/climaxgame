@@ -56,9 +56,9 @@ export function AuthModal() {
     close()
     if (profile && !profile.onboarding_completed_at) {
       router.push(`/onboarding?next=${encodeURIComponent(nextPath)}`)
-    } else {
-      router.refresh()
     }
+    // El layout (barra superior, campana) se vuelve a pedir con la sesión nueva.
+    router.refresh()
   }
 
   async function signInWithGoogle() {

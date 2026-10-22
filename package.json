@@ -18,7 +18,9 @@
     "db:push": "supabase db push",
     "db:types": "supabase gen types typescript --linked > lib/supabase/database.types.ts",
     "catalog:sync": "tsx --env-file=.env.local scripts/sync-catalog.mts",
-    "catalog:seed": "tsx --env-file=.env.local scripts/sync-catalog.mts --seed"
+    "catalog:seed": "tsx --env-file=.env.local scripts/sync-catalog.mts --seed",
+    "community:seed": "tsx --env-file=.env.local scripts/seed-community.mts",
+    "community:reset": "tsx --env-file=.env.local scripts/seed-community.mts --reset"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

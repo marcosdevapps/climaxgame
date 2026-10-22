@@ -163,7 +163,9 @@ function GameHeader({ game }: { game: GameDetail }) {
 // El contador se lee fresco en cada visita; el resto de la ficha va cacheado.
 async function GameFavorite({ gameId, title }: { gameId: number; title: string }) {
   const { data } = await createPublicClient().from('games').select('favorites_count').eq('id', gameId).single()
-  return <FavoriteButton gameId={gameId} title={title} variant="full" initialCount={data?.favorites_count ?? 0} />
+  const count = data?.favorites_count ?? 0
+  // key: si el servidor trae un contador nuevo (router.refresh), el botón se reinicia con él.
+  return <FavoriteButton key={count} gameId={gameId} title={title} variant="full" initialCount={count} />
 }
 
 function Score({ label, score }: { label: string; score: number | null }) {

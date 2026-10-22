@@ -78,7 +78,6 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         if (action.type === 'favorite') {
           const { error } = await supabase.from('favorites').insert({ user_id: uid, game_id: action.gameId })
           if (error && !isDuplicate(error)) throw error
-          setFavoriteIds((prev) => new Set(prev).add(action.gameId))
           toast.success('Agregado a tus favoritos')
         } else if (action.type === 'like') {
           const { error } = await supabase.from('comment_likes').insert({ user_id: uid, comment_id: action.commentId })
@@ -111,9 +110,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       }
       if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
         // Fuera del callback: Supabase recomienda no llamar a la API dentro de él.
-        setTimeout(() => {
-          void loadFavorites(uid)
-          void runPending(uid)
+        // Primero la acción pendiente y después los favoritos, para que la carga
+        // no pise el favorito recién agregado.
+        setTimeout(async () => {
+          await runPending(uid)
+          await loadFavorites(uid)
         }, 0)
       }
     })
