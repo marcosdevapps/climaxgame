@@ -2,6 +2,7 @@ import 'server-only'
 
 import { createClient } from '@supabase/supabase-js'
 
+import type { Database } from './database.types'
 import { getSupabaseEnv } from './env'
 
 // Cliente con la secret key: ignora RLS. Solo para el sync del catálogo,
@@ -13,7 +14,7 @@ export function createAdminClient() {
     throw new Error('Falta SUPABASE_SECRET_KEY (ver .env.example)')
   }
 
-  return createClient(url, secretKey, {
+  return createClient<Database>(url, secretKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 }

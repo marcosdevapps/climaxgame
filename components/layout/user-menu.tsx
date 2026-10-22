@@ -36,6 +36,6 @@ async function getCurrentProfile() {
     .from('profiles')
     .select('username, avatar_url')
     .eq('id', data.claims.sub)
-    .single<{ username: string; avatar_url: string | null }>()
+    .single()
   return profile
 }

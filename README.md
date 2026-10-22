@@ -77,4 +77,4 @@ pnpm db:push
 pnpm db:types
 ```
 
-Después de generar los tipos, pasa `Database` como genérico a `createServerClient` / `createBrowserClient` en `lib/supabase/`.
+Los clientes de `lib/supabase/` ya usan los tipos de `database.types.ts`. Cada vez que cambie el esquema, regenéralos con `pnpm db:types`.

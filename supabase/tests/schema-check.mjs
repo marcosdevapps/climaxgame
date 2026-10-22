@@ -397,6 +397,19 @@ ok(
   'solo notificaciones propias',
 )
 
+// Funciones internas fuera de la Data API
+ok(
+  (
+    await q(`select count(*)::int as n from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+            where n.nspname = 'public' and p.proname in ('is_moderator', 'has_blocked', 'can_view_profile_content')`)
+  )[0].n === 0,
+  'auxiliares de RLS en esquema private',
+)
+ok(
+  await fails(() => as(U.bob, () => q(`select private.check_comment_content($1, 'hola')`, [U.bob]))),
+  'cliente no ejecuta check_comment_content',
+)
+
 // Búsqueda
 const s1 = await as(null, () => q(`select title from public.search_games('zelda')`))
 ok(s1[0]?.title.startsWith('The Legend of Zelda'), 'búsqueda por palabra')
