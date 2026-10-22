@@ -4,6 +4,7 @@ import { safeNextPath } from '@/lib/safe-redirect'
 import { createClient } from '@/lib/supabase/server'
 
 // Destino de Google OAuth y de los enlaces de verificación / recuperación (flujo PKCE).
+// Si es la primera vez, pasa por el onboarding antes de volver a donde estaba.
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl
   const code = searchParams.get('code')
@@ -11,9 +12,18 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('onboarding_completed_at')
+        .eq('id', data.user.id)
+        .single()
+      const destination =
+        profile && !profile.onboarding_completed_at && !next.startsWith('/onboarding')
+          ? `/onboarding?next=${encodeURIComponent(next)}`
+          : next
+      return NextResponse.redirect(`${origin}${destination}`)
     }
   }
 

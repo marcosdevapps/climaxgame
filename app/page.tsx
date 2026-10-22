@@ -1,32 +1,68 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import Link from 'next/link'
+import { Suspense } from 'react'
 
-// Home provisoria del sprint 1. El sprint 2 la reemplaza con el hero y los
-// carruseles alimentados desde el catálogo de IGDB (historia D1).
-const SECTIONS = ['Populares ahora', 'Recién lanzados', 'Próximamente']
+import { FavoriteButton } from '@/components/game/favorite-button'
+import { GameCarousel } from '@/components/game/game-carousel'
+import { IgdbImage } from '@/components/game/igdb-image'
+import { ScoreBadge } from '@/components/game/score-badge'
+import { NetworkActivity } from '@/components/home/network-activity'
+import { SignupBanner } from '@/components/home/signup-banner'
+import { Button } from '@/components/ui/button'
+import { getHomeSections, type HeroGame } from '@/lib/data/catalog'
+import { formatDate } from '@/lib/format'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { hero, trending, recent, upcoming } = await getHomeSections()
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <section className="mb-10 max-w-2xl">
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-          Tu red gamer en <span className="text-primary">español</span>
-        </h1>
-        <p className="mt-3 text-muted-foreground">
-          Descubre qué salió, qué viene y qué es popular. Guarda tus favoritos, opina en cada juego y sigue a jugadores
-          con tus mismos gustos.
-        </p>
-      </section>
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      {hero && <Hero game={hero} />}
 
-      {SECTIONS.map((title) => (
-        <section key={title} className="mb-8" aria-label={title}>
-          <h2 className="mb-3 text-lg font-semibold">{title}</h2>
-          <div className="flex gap-3 overflow-hidden">
-            {Array.from({ length: 6 }, (_, i) => (
-              <Skeleton key={i} className="aspect-[3/4] w-32 shrink-0 rounded-lg md:w-40" />
-            ))}
-          </div>
-        </section>
-      ))}
+      <GameCarousel title="Populares ahora" games={trending} href="/explorar/populares" />
+      <GameCarousel title="Recién lanzados" games={recent} href="/explorar/recientes" />
+
+      {/* El banner aparece después del segundo carrusel, no al cargar la página. */}
+      <Suspense fallback={null}>
+        <SignupBanner />
+      </Suspense>
+
+      <GameCarousel title="Próximamente" games={upcoming} href="/explorar/proximos" countdown />
+
+      <Suspense fallback={null}>
+        <NetworkActivity />
+      </Suspense>
     </div>
+  )
+}
+
+function Hero({ game }: { game: HeroGame }) {
+  return (
+    <section className="relative mb-10 overflow-hidden rounded-xl border">
+      <div className="absolute inset-0">
+        {game.background_image_id && (
+          <IgdbImage imageId={game.background_image_id} size="1080p" alt="" priority sizes="100vw" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20 md:bg-gradient-to-r" />
+      </div>
+      <div className="relative flex min-h-80 flex-col justify-end gap-3 p-5 md:min-h-96 md:max-w-xl md:p-8">
+        <p className="text-xs font-semibold tracking-wider text-primary uppercase">El más jugado del momento</p>
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{game.title}</h1>
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <ScoreBadge score={game.critic_score} label="Nota de la crítica" />
+          {game.release_date && <span>{formatDate(game.release_date, 'UTC')}</span>}
+        </div>
+        {game.summary_en && (
+          <p lang="en" className="line-clamp-3 text-sm text-muted-foreground">
+            {game.summary_en}
+          </p>
+        )}
+        <div className="flex flex-wrap items-start gap-3 pt-1">
+          <Button asChild size="lg" variant="outline">
+            <Link href={`/juego/${game.slug}`}>Ver ficha</Link>
+          </Button>
+          <FavoriteButton gameId={game.id} title={game.title} variant="full" />
+        </div>
+      </div>
+    </section>
   )
 }

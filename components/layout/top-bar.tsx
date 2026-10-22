@@ -1,9 +1,10 @@
-import { Bell, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import Link from 'next/link'
 import { Suspense } from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'
 
+import { NotificationBell } from './notification-bell'
 import { UserMenu } from './user-menu'
 
 export function TopBar() {
@@ -29,13 +30,9 @@ export function TopBar() {
         </Link>
 
         <div className="ml-auto flex items-center gap-2 md:ml-0">
-          <Link
-            href="/actividad"
-            aria-label="Notificaciones"
-            className="hidden size-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground md:flex"
-          >
-            <Bell className="size-5" />
-          </Link>
+          <Suspense fallback={null}>
+            <NotificationBell />
+          </Suspense>
           <Suspense fallback={<Skeleton className="size-8 rounded-full" />}>
             <UserMenu />
           </Suspense>

@@ -10,6 +10,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // "use cache" + cacheLife/cacheTag para home y fichas (plan, sección 3.2).
   cacheComponents: true,
+  // Evita que Turbopack tome como raíz un lockfile de una carpeta superior.
+  turbopack: { root: process.cwd() },
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
