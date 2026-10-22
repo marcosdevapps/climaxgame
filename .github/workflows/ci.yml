@@ -43,5 +43,11 @@ jobs:
       - name: Tests de base de datos (RLS, triggers, RPC)
         run: pnpm test:db
 
+      # La home y la búsqueda se prerenderizan leyendo el catálogo público.
+      # URL y clave publicable son públicas por diseño (van en el bundle del navegador; RLS protege los datos).
       - name: Build
         run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://jqbdjfkcrabkivlmtkdf.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_VaPqd5tXCBuslPjJyLFEnA_Xi6Gf87P
+          NEXT_PUBLIC_SITE_URL: https://climaxgame.vercel.app
